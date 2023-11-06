@@ -1,0 +1,37 @@
+
+"""test before adding min tempertures to get the correct mean of each year"""
+
+import pandas as  pd
+import numpy as np
+import matplotlib.pyplot as plt
+import plotly.express as px
+
+data="armaghdata.txt"
+x=open(data)
+file=pd.read_csv(x)
+df=pd.DataFrame(file)
+df.columns=("year","month","max","min")
+df = df.replace('---', np.NaN)
+df=df.dropna()
+df["max"]=df["max"].astype(float)
+df["min"]=df["min"].astype(float)
+yearly_max_totals = {}
+grouped = df.groupby('year')['max'].mean()
+grouped=grouped.round(2)
+yearly_max_totals = grouped.to_dict()
+yearly_max_df = pd.DataFrame(list(yearly_max_totals.items()), columns=["Year", "Max Temperature Mean"])
+yearly_max_df = yearly_max_df.iloc[1:-1]
+
+
+x = yearly_max_df["Year"]
+y = yearly_max_df["Max Temperature Mean"]
+coefficients = np.polyfit(x, y, 1)
+trendline = np.poly1d(coefficients)
+trendline_y = trendline(x)
+
+
+yearly_max_df["Trendline"] = trendline_y
+fig = px.line(yearly_max_df, x="Year", y="Max Temperature Mean", title="Yearly Max Temperature Mean")
+fig.add_scatter(x=yearly_max_df["Year"], y=yearly_max_df["Trendline"], mode="lines", name="Trendline")
+fig.update_xaxes(type='category')
+fig.show()
