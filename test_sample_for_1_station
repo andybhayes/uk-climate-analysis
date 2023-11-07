@@ -1,0 +1,29 @@
+import pandas as pd
+import plotly.express as px
+import numpy as np
+
+data = r"C:\Users\andyb\AppData\Roaming\JetBrains\PyCharmCE2023.1\scratches\downloaded_txt_files_modified\armaghdata.txt"
+x = open(data)
+file = pd.read_csv(x)
+df = pd.DataFrame(file)
+df.columns = ["year", "month", "max", "min"]
+df = df.replace('---', np.NaN)
+df = df.dropna()
+
+df["max"] = df["max"].astype(float)
+df["min"] = df["min"].astype(float)
+
+# Calculate the mean of 'max' and 'min' temperatures for each year
+yearly_mean_df = df.groupby('year').agg({'max': 'mean', 'min': 'mean'}).reset_index()
+yearly_mean_df.columns = ["Year", "Max Temperature Mean", "Min Temperature Mean"]
+
+# Exclude the first and last rows
+yearly_mean_df = yearly_mean_df.iloc[1:-1]
+
+# Calculate the average of 'Max Temperature Mean' and 'Min Temperature Mean' for each year
+yearly_mean_df['Average Temperature'] = (yearly_mean_df['Max Temperature Mean'] + yearly_mean_df['Min Temperature Mean']) / 2
+
+fig = px.line(yearly_mean_df, x="Year", y=["Max Temperature Mean", "Min Temperature Mean", "Average Temperature"], title="Yearly Temperature Means")
+fig.update_xaxes(type='category')
+
+fig.show()
