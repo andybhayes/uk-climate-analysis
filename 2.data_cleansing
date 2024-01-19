@@ -1,4 +1,7 @@
-"""first step of cleaning the data"""
+"""first step of cleaning the data
+    removes text which is preventing it becoming columns,
+    removes all columns except 4 needed for temperture
+"""
 
 import os
 import pandas as pd
