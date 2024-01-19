@@ -1,0 +1,27 @@
+import shutil
+import os
+
+area_file = r"C:\Users\andyb\Desktop\urbantype.txt"
+files = "downloaded_txt_files_modified"
+area_type = {
+    "urban": [],
+    "rural": [],
+    "airport": [],
+    "semi-rural": []
+}
+
+with open(area_file, "r") as file_object:
+    for place in file_object:
+        place = place.strip().lower().split()
+        if len(place) > 1:
+            if place[1] == "u":
+                area_type["urban"].append(place[0]+"data.txt")
+
+            elif place[1] == "r":
+                area_type["rural"].append(place[0] + "data.txt")
+
+            elif place[1] == "a":
+                area_type["airport"].append(place[0]+"data.txt")
+
+            elif place[1] == "s":
+                area_type["semi-rural"].append(place[0]+"data.txt")
