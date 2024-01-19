@@ -1,0 +1,39 @@
+"""first step of cleaning the data"""
+
+import os
+import pandas as pd
+
+input_folder = "downloaded_txt_files"
+output_folder = "downloaded_txt_files_modified"
+
+os.makedirs(output_folder, exist_ok=True)
+
+for file_name in os.listdir(input_folder):
+    if file_name.endswith(".txt"):
+        input_file_path = os.path.join(input_folder, file_name)
+        output_file_path = os.path.join(output_folder, file_name)
+
+        with open(input_file_path, "r") as file:
+            with open(output_file_path, "w") as writeto:
+                f = file.readlines()
+                for line in f:
+                    words = line.split()
+                    truncated_line = ' '.join(words[:4])
+                    truncated_line = truncated_line.replace("*", "")
+                    truncated_line = truncated_line.replace(" ", ",")
+                    if words[0].startswith("1") or words[0].startswith("2"):
+                        writeto.write(truncated_line + "\n")
+
+"""second step removes "---" entries and and years which hasnt got the full 12 month records"""
+for file_name in os.listdir(output_folder):
+    if file_name.endswith(".txt"):
+        file_path = os.path.join(output_folder, file_name)
+        df = pd.read_csv(file_path, header=None, names=["Year", "Month", "max", "min"])
+        df["YearMonth"] = df["Year"].astype(str) + df["Month"].astype(str)
+
+
+        df = df[df["max"] != '---']
+        df = df[df.groupby('Year')['Month'].transform('nunique').eq(12)]
+        df = df.drop("YearMonth", axis=1)
+        df.to_csv(file_path, index=False, header=False)
+print("done")
