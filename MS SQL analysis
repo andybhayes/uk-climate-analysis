@@ -1,0 +1,45 @@
+--this first part calculates the mean from each rural station
+use test;
+with means as (
+    select
+        arm.year,
+        avg(arm.armMIN + arm.armMAX) / 2 as armMEAN,
+        avg(ab.abmax + ab.abmin) / 2 as abMEAN,
+        avg(esk.eskMIN + esk.eskMAX) / 2 as eskMEAN
+    from
+        arm
+    join ab on arm.year = ab.year and arm.month = ab.month
+    join esk on arm.year = esk.year and arm.month = esk.month
+    where
+        arm.year between 1960 and 2020
+    group by
+        arm.year
+)
+
+select
+    year,
+    cast((armMEAN + abMEAN + eskMEAN) / 3 as decimal(5, 2)) as ruralMEANS
+from
+    means
+order by
+    year;
+;
+
+
+--this combines the mean from above and produces mean for thr rural data set
+with semi as(
+select
+	ler.year,(avg(ler.lermax)+avg(ler.lerMIn))/2 as lerMEAN,
+	(avg(new.newMAX)+avg(new.newMIN))/2 as newMEAN,
+	(avg(sut.MIN)+avg(sut.MAX))/2 as sutMEAN
+	
+	
+from ler
+join new on ler.year = new.year and ler.month =new.month
+join sut on ler.year = sut.year and ler.month=sut.month
+where ler.year between 1960 and 2020
+group by ler.year
+)
+
+select   year,(lermean+newmean+sutmean)/3 as semiMEAN from semi
+order by year;
