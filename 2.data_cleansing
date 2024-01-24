@@ -1,8 +1,4 @@
-"""first step of cleaning the data
-    removes text which is preventing it becoming columns,
-    removes all columns except 4 needed for temperture
-"""
-
+#clean the data and  remove unnecessary columns
 import os
 import pandas as pd
 
@@ -11,6 +7,8 @@ output_folder = "downloaded_txt_files_modified"
 
 os.makedirs(output_folder, exist_ok=True)
 
+
+#first run though of the files to clean
 for file_name in os.listdir(input_folder):
     if file_name.endswith(".txt"):
         input_file_path = os.path.join(input_folder, file_name)
@@ -27,16 +25,22 @@ for file_name in os.listdir(input_folder):
                     if words[0].startswith("1") or words[0].startswith("2"):
                         writeto.write(truncated_line + "\n")
 
-"""second step removes "---" entries and and years which hasnt got the full 12 month records"""
+# seconnd run though to clean and keep the 4 columns needed for temperture records 
 for file_name in os.listdir(output_folder):
     if file_name.endswith(".txt"):
         file_path = os.path.join(output_folder, file_name)
         df = pd.read_csv(file_path, header=None, names=["Year", "Month", "max", "min"])
         df["YearMonth"] = df["Year"].astype(str) + df["Month"].astype(str)
 
+        # Exclude years with "---" in the 'min' column
+        invalid_years = df[df["min"] == '---']["Year"].astype(int)
+        if not invalid_years.empty:
+            last_invalid_year = invalid_years.max()
+            df = df[df["Year"] > last_invalid_year]
 
         df = df[df["max"] != '---']
         df = df[df.groupby('Year')['Month'].transform('nunique').eq(12)]
         df = df.drop("YearMonth", axis=1)
         df.to_csv(file_path, index=False, header=False)
+
 print("done")
