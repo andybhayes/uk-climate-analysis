@@ -1,0 +1,75 @@
+import pandas as pd
+
+headers = ["Year", "Month", "max", "min"]
+file_path = "armaghdata.txt"
+df = pd.read_csv(file_path, header=None, names=headers)
+
+# Convert 'Year' and 'Month' to datetime format
+df['Date'] = pd.to_datetime(df[['Year', 'Month']].assign(DAY=1))
+
+# Filter the DataFrame based on the specified date range (1873 to 2023)
+df_filtered = df[(df['Date'] >= '1870-01-01') & (df['Date'] <= '2020-12-31')]
+
+# Use .loc to avoid SettingWithCopyWarning
+df_filtered.loc[:, 'AvgTemperature'] = df_filtered[['max', 'min']].mean(axis=1)
+
+# Group by decades and calculate average temperature
+df_decades = df_filtered.set_index('Date').resample('10Y').mean()
+
+# Calculate temperature increase per decade
+df_decades['TemperatureIncrease'] = df_decades['AvgTemperature'].diff()
+
+# Print or plot the results
+print(df_decades[['AvgTemperature', 'TemperatureIncrease']])
+
+# Calculate the difference between the last and first values
+last_avg_temp = df_decades['AvgTemperature'].iloc[-1]
+first_avg_temp = df_decades['AvgTemperature'].iloc[0]
+avg_temp_diff = round(last_avg_temp - first_avg_temp, 3)
+
+last_temp_increase = df_decades['TemperatureIncrease'].iloc[-1]
+first_temp_increase = df_decades['TemperatureIncrease'].iloc[0]
+temp_increase_diff = round(last_temp_increase - first_temp_increase, 3)
+
+# Calculate the percentage increase
+avg_temp_percentage_increase = round((avg_temp_diff / first_avg_temp) * 100, 3)
+temp_increase_percentage_increase = round((temp_increase_diff / first_temp_increase) * 100, 3)
+
+# Print the results
+print(f"\nDifference in AvgTemperature: {avg_temp_diff}")
+print(f"Percentage Increase in AvgTemperature: {avg_temp_percentage_increase}%")
+
+print(f"\nDifference in TemperatureIncrease: {temp_increase_diff}")
+print(f"Percentage Increase in TemperatureIncrease: {temp_increase_percentage_increase}%")
+
+
+
+"""
+results for armagh, oldest rural station
+            AvgTemperature  TemperatureIncrease
+Date                                           
+1870-12-31        9.533333                  NaN
+1880-12-31        9.490417            -0.042917
+1890-12-31        8.611667            -0.878750
+1900-12-31        8.880417             0.268750
+1910-12-31        8.904583             0.024167
+1920-12-31        8.978333             0.073750
+1930-12-31        9.032500             0.054167
+1940-12-31        9.314167             0.281667
+1950-12-31        9.570417             0.256250
+1960-12-31        9.372500            -0.197917
+1970-12-31        9.092500            -0.280000
+1980-12-31        9.096250             0.003750
+1990-12-31        9.229583             0.133333
+2000-12-31        9.707083             0.477500
+2010-12-31        9.967500             0.260417
+2020-12-31       10.020000             0.052500
+
+Difference in AvgTemperature: 0.487
+Percentage Increase in AvgTemperature: 5.108%
+
+Difference in TemperatureIncrease: nan
+Percentage Increase in TemperatureIncrease: nan%
+
+Process finished with exit code 0
+"""
