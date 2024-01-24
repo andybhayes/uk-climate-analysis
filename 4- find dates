@@ -1,0 +1,54 @@
+#iterates though each file to print of the dates of what the stations have recorded
+import os
+
+folder_path = "scratches"
+
+area = {
+    "urban": [],
+    "rural": [],
+    "semi": [],
+    "airport": []
+}
+
+def firstandlast(file_path):
+    last_line = None
+    with open(file_path, 'r') as f:
+        x = f.readline().strip().split(",")
+        for line in f:
+            line = line.strip().strip(",")  # Remove leading/trailing whitespaces and commas
+            last_line = line  # Store the current line
+
+    # Extract area, file name, and both the first and last lines after the loop
+    if last_line is not None:
+        last_line = last_line.strip().split(",")
+        both = (x[0], last_line[0])
+        area_name = file_path.split(os.path.sep)[-2]  # Extract area from file path
+        file_name = os.path.splitext(file_path.split(os.path.sep)[-1])[0]  # Extract file name from file path
+        file_info = f"{file_name},{both[0]},{both[1]}"
+
+        # Check if the area is "airport" and append the file information to the corresponding list in the dictionary
+        if area_name == "rural":
+            area["rural"].append(file_info)
+        elif area_name == "airport":
+            area["airport"].append(file_info)
+        elif area_name == "urban":
+            area["urban"].append(file_info)
+        elif area_name == "semi-rural":
+            area["semi"].append(file_info)
+
+def check_all():
+    for root, dirs, files in os.walk(folder_path):
+        for file_name in files:
+            file_path = os.path.join(root, file_name)
+            firstandlast(file_path)
+
+# Call check_all to process all files in the specified directory
+check_all()
+
+
+for area_name, file_list in area.items():
+    sorted_files = sorted(file_list, key=lambda x: x.split(",")[1])
+    print(f"\nArea: {area_name}")
+    for file_info in sorted_files:
+        print(file_info)
+
