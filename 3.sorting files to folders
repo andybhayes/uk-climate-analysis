@@ -4,7 +4,7 @@
 import shutil
 import os
 
-area_file = r"C:\Users\andyb\Desktop\urbantype.txt"
+area_file = "urbantype.txt"
 files = "downloaded_txt_files_modified"
 area_type = {
     "urban": [],
