@@ -1,3 +1,6 @@
+"""sorts though all files and  makes 4 serprate folders for the differnt location types of weather stations
+ using a text file to reference from"""
+
 import shutil
 import os
 
