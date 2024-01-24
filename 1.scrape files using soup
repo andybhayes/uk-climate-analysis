@@ -1,3 +1,5 @@
+#Scrapes all 37 historic weather station file from Met Office
+
 import requests
 from bs4 import BeautifulSoup
 import os
