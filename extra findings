@@ -10,7 +10,7 @@ Heathrow throught 1960-2020 has increased by 1.99C, must higher than the average
 
 
 
-This shows cycling of temperture in Armagh though by decade using pandas to caclulate
+This shows cycling of temperture in Armagh through the decade using pandas to caclulate
             AvgTemperature  TemperatureIncrease
 Date                                           
 1870-12-31        9.533333                  NaN
